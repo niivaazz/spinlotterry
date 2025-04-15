@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Withdraw</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background: #f2f2f2;
+    }
+    .container {
+      max-width: 400px;
+      background: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .container h2 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+    }
+    input {
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 0.5rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 1.5rem;
+      width: 100%;
+      padding: 0.8rem;
+      background: #16a34a;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .wallet {
+      text-align: center;
+      margin-bottom: 1rem;
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+    .success {
+      color: green;
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+    .history {
+      margin-top: 2rem;
+    }
+    .history-item {
+      background: #e7ffe7;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Withdraw</h2>
+  <div class="wallet">Wallet Balance: ₹<span id="walletBalance">0</span></div>
+
+  <label for="amount">Amount</label>
+  <input type="number" id="amount" placeholder="Enter amount to withdraw" />
+
+  <label for="upi">UPI ID</label>
+  <input type="text" id="upi" placeholder="Enter your UPI ID" />
+
+  <button onclick="submitWithdraw()">Withdraw</button>
+  <div id="message" class=""></div>
+
+  <div class="history" id="history"></div>
+</div>
+
+<script>
+  let user = JSON.parse(localStorage.getItem("currentUser")) || { balance: 0 };
+  let walletBalanceEl = document.getElementById("walletBalance");
+  walletBalanceEl.textContent = user.balance;
+
+  function submitWithdraw() {
+    const amount = parseFloat(document.getElementById("amount").value);
+    const upi = document.getElementById("upi").value.trim();
+    const message = document.getElementById("message");
+
+    message.textContent = "";
+    message.className = "";
+
+    if (!amount || amount < 150 || amount > 100000) {
+      message.textContent = "Amount must be between ₹150 and ₹100000";
+      message.className = "error";
+      return;
+    }
+
+    if (!upi) {
+      message.textContent = "Please enter a valid UPI ID";
+      message.className = "error";
+      return;
+    }
+
+    if (user.balance < amount) {
+      message.textContent = "Insufficient balance!";
+      message.className = "error";
+      return;
+    }
+
+    // Deduct balance
+    user.balance -= amount;
+    localStorage.setItem("currentUser", JSON.stringify(user));
+    walletBalanceEl.textContent = user.balance;
+
+    // Save withdraw history
+    const withdrawHistory = JSON.parse(localStorage.getItem("withdrawHistory")) || [];
+    withdrawHistory.unshift({
+      amount,
+      upi,
+      date: new Date().toLocaleString()
+    });
+    localStorage.setItem("withdrawHistory", JSON.stringify(withdrawHistory));
+
+    message.textContent = "Withdrawal successful!";
+    message.className = "success";
+
+    // Reset form
+    document.getElementById("amount").value = "";
+    document.getElementById("upi").value = "";
+
+    showHistory();
+  }
+
+  function showHistory() {
+    const withdrawHistory = JSON.parse(localStorage.getItem("withdrawHistory")) || [];
+    const historyDiv = document.getElementById("history");
+    historyDiv.innerHTML = "<h3>Withdraw History</h3>";
+
+    withdrawHistory.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "history-item";
+      div.innerHTML = `
+        <strong>Amount:</strong> ₹${item.amount}<br>
+        <strong>UPI:</strong> ${item.upi}<br>
+        <strong>Date:</strong> ${item.date}
+      `;
+      historyDiv.appendChild(div);
+    });
+  }
+
+  showHistory();
+</script>
+
+</body>
+</html>

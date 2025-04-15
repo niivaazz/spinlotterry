@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spin Lottery Lobby</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: white;
+      min-height: 100vh;
+      padding: 1rem;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.2rem;
+      margin-bottom: 1.5rem;
+      color: #facc15;
+    }
+
+    .wallet-bar {
+      display: flex;
+      flex-direction: column;
+      background-color: #1e293b;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .wallet-info {
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+
+    .wallet-info span {
+      color: #10b981;
+      font-weight: bold;
+    }
+
+    .wallet-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .wallet-buttons button {
+      background-color: #2563eb;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .wallet-buttons button:hover {
+      background-color: #1d4ed8;
+    }
+
+    .game-card {
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(145deg, #2e3a59, #1f2a3e);
+      border-radius: 20px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+      transform: translateY(20px);
+      opacity: 0;
+      animation: fadeUp 0.8s ease-out forwards;
+    }
+
+    .game-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+    }
+
+    .game-title {
+      padding: 1rem;
+      font-size: 1.2rem;
+      text-align: center;
+      background-color: #111827;
+      color: #fbbf24;
+    }
+
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      background: #111827;
+      padding: 1rem;
+      border-radius: 12px;
+    }
+
+    footer button {
+      background: #10b981;
+      border: none;
+      padding: 10px 18px;
+      margin: 5px;
+      border-radius: 8px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    footer button:hover {
+      background: #059669;
+    }
+
+    @keyframes fadeUp {
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://www.transparenttextures.com/patterns/black-linen.png');
+      opacity: 0.05;
+      z-index: -1;
+      animation: scrollBg 30s linear infinite;
+    }
+
+    @keyframes scrollBg {
+      0% { background-position: 0 0; }
+      100% { background-position: 100% 100%; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <h1>🎲 Spin Lottery Lobby</h1>
+
+  <div class="wallet-bar">
+    <div class="wallet-info">💰 Wallet: ₹<span id="walletAmount">99</span></div>
+    <div class="wallet-info">🆔 UID: <span id="userUid">000000</span> <button onclick="copyUID()">📋</button></div>
+    <div class="wallet-buttons">
+      <button onclick="window.location.href='deposit.html'">Deposit</button>
+      <button onclick="window.location.href='withdraw.html'">Withdraw</button>
+    </div>
+  </div>
+
+  <!-- Game Cards in Separate Rows -->
+  <div class="game-card" onclick="location.href='wingo-1min.html'">
+    <img src="https://cdn.pixabay.com/photo/2021/03/06/20/54/game-6075629_960_720.jpg" alt="Wingo 1 Min" />
+    <div class="game-title">Wingo 1 Min</div>
+  </div>
+
+  <div class="game-card" onclick="location.href='casino.html'">
+    <img src="https://cdn.pixabay.com/photo/2016/11/18/15/07/poker-1839067_960_720.jpg" alt="Casino" />
+    <div class="game-title">Casino</div>
+  </div>
+
+  <div class="game-card" onclick="location.href='slots.html'">
+    <img src="https://cdn.pixabay.com/photo/2019/07/02/19/08/slot-4316938_960_720.jpg" alt="Slots" />
+    <div class="game-title">Slots</div>
+  </div>
+
+  <div class="game-card" onclick="location.href='aviator.html'">
+    <img src="https://cdn.pixabay.com/photo/2016/09/06/14/45/airplane-1644927_960_720.jpg" alt="Aviator" />
+    <div class="game-title">Aviator</div>
+  </div>
+
+  <div class="game-card" onclick="location.href='spinwheel.html'">
+    <img src="https://cdn.pixabay.com/photo/2020/02/11/17/01/wheel-4838054_960_720.jpg" alt="Spin Wheel" />
+    <div class="game-title">Spin Wheel</div>
+  </div>
+
+  <footer>
+    <button onclick="window.location.href='login.html'">Logout</button>
+    <button onclick="window.location.href='mailto:spinlotterycostumer@gmail.com'">Customer Service</button>
+  </footer>
+
+  <script>
+    const uid = localStorage.getItem("currentUserUID") || "000000";
+    const wallet = localStorage.getItem("currentUserWallet") || "99";
+
+    document.getElementById("userUid").innerText = uid;
+    document.getElementById("walletAmount").innerText = wallet;
+
+    function copyUID() {
+      navigator.clipboard.writeText(uid);
+      alert("UID copied to clipboard!");
+    }
+  </script>
+
+</body>
+</html>

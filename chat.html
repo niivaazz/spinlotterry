@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Service Chat</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f4f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #dc2626;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+    .chat-container {
+      width: 100%;
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+    .message-box {
+      height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: #fafafa;
+    }
+    .message {
+      margin-bottom: 1rem;
+    }
+    .user-message {
+      color: #2b6cb0;
+      text-align: right;
+    }
+    .agent-message {
+      color: #48bb78;
+    }
+    .input-box {
+      display: flex;
+      justify-content: space-between;
+    }
+    .input-box textarea {
+      width: 80%;
+      height: 50px;
+      padding: 0.5rem;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+    .input-box button {
+      width: 15%;
+      padding: 0.7rem;
+      background-color: #dc2626;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .input-box button:hover {
+      background-color: #b91c1c;
+    }
+  </style>
+</head>
+<body>
+
+  <header>Customer Service Chat</header>
+
+  <div class="chat-container">
+    <div class="message-box" id="messageBox">
+      <!-- Messages will appear here -->
+    </div>
+
+    <div class="input-box">
+      <textarea id="userMessage" placeholder="Type your message..."></textarea>
+      <button id="sendMessageBtn">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const sendMessageBtn = document.getElementById('sendMessageBtn');
+    const userMessageInput = document.getElementById('userMessage');
+    const messageBox = document.getElementById('messageBox');
+
+    sendMessageBtn.addEventListener('click', function() {
+      const userMessage = userMessageInput.value.trim();
+      if (userMessage) {
+        addMessage(userMessage, 'user');
+        userMessageInput.value = ''; // Clear the input box
+        
+        // Simulate agent's response (can be replaced with actual response)
+        setTimeout(function() {
+          addMessage('Thank you for your message! A support agent will assist you shortly.', 'agent');
+        }, 1500);
+      }
+    });
+
+    // Function to add messages to the chat box
+    function addMessage(message, sender) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'agent-message');
+      messageDiv.textContent = message;
+      messageBox.appendChild(messageDiv);
+      messageBox.scrollTop = messageBox.scrollHeight; // Scroll to the bottom
+    }
+  </script>
+
+</body>
+</html>

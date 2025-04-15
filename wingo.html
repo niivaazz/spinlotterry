@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spin Lottery - Wingo 30 Sec</title>
+  <style>
+    /* Your existing CSS here */
+  </style>
+</head>
+<body>
+  <header>🎲 Spin Lottery - Wingo 30 Sec</header>
+  <div class="wallet">
+    <div>Wallet: ₹<span id="walletAmount">1000</span></div>
+    <div>
+      <a href="#">Deposit</a>
+      <a href="#">Withdraw</a>
+    </div>
+  </div>
+
+  <div class="buttons">
+    <button class="big" onclick="openBet('Big')">Big</button>
+    <button class="small" onclick="openBet('Small')">Small</button>
+    <button class="red" onclick="openBet('Red')">Red</button>
+    <button class="green" onclick="openBet('Green')">Green</button>
+  </div>
+
+  <div class="countdown">⏳ Time left: <span id="countdown">--</span></div>
+
+  <table>
+    <thead>
+      <tr><th>Time</th><th>Big/Small</th><th>Red/Green</th></tr>
+    </thead>
+    <tbody id="results"></tbody>
+  </table>
+
+  <table>
+    <thead>
+      <tr><th>Time</th><th>Type</th><th>Amount</th><th>Status</th></tr>
+    </thead>
+    <tbody id="history"></tbody>
+  </table>
+
+  <div class="modal" id="betModal">
+    <div class="modal-content">
+      <h3>Enter Amount for <span id="betType"></span></h3>
+      <input type="number" id="betAmount" placeholder="Enter amount">
+      <button onclick="confirmBet()">Place Bet</button>
+    </div>
+  </div>
+
+  <script>
+    let selectedBet = '';
+    // Set userId dynamically. For example, this can be fetched after a login event.
+    let userId = 'user1'; // Example: replace with actual dynamic user ID
+    let timeLimit = 30;
+
+    function updateCountdown() {
+      const now = new Date();
+      const sec = now.getSeconds();
+      document.getElementById('countdown').innerText = (timeLimit - sec).toString().padStart(2, '0');
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    function openBet(type) {
+      selectedBet = type;
+      document.getElementById('betType').innerText = type;
+      document.getElementById('betModal').style.display = 'flex';
+    }
+
+    function confirmBet() {
+      const amount = parseFloat(document.getElementById('betAmount').value);
+      if (amount <= 0 || isNaN(amount)) return alert('Enter valid amount');
+      
+      // Get wallet data from localStorage specific to the user
+      let wallet = parseFloat(localStorage.getItem(userId + '_wallet') || 1000);
+      if (wallet < amount) return alert('Insufficient balance');
+      
+      wallet -= amount;
+      localStorage.setItem(userId + '_wallet', wallet);
+      document.getElementById('walletAmount').innerText = wallet;
+      
+      // Get bet history specific to the user
+      const bets = JSON.parse(localStorage.getItem(userId + '_bets') || '[]');
+      bets.unshift({ time: new Date().toLocaleTimeString(), type: selectedBet, amount: amount, status: 'Pending' });
+      localStorage.setItem(userId + '_bets', JSON.stringify(bets));
+      
+      updateHistory();
+      document.getElementById('betModal').style.display = 'none';
+    }
+
+    function updateHistory() {
+      const bets = JSON.parse(localStorage.getItem(userId + '_bets') || '[]');
+      const history = document.getElementById('history');
+      history.innerHTML = '';
+      bets.forEach(b => {
+        history.innerHTML += `<tr><td>${b.time}</td><td>${b.type}</td><td>₹${b.amount}</td><td>${b.status}</td></tr>`;
+      });
+    }
+
+    function updateResults() {
+      const results = JSON.parse(localStorage.getItem('wingo_results') || '[]');
+      const tbody = document.getElementById('results');
+      tbody.innerHTML = '';
+      results.forEach(r => {
+        tbody.innerHTML += `<tr><td>${r.time}</td><td>${r.bigSmall}</td><td>${r.color}</td></tr>`;
+      });
+    }
+
+    function simulateRound() {
+      const time = new Date().toLocaleTimeString();
+      const bigSmall = Math.random() < 0.5 ? 'Big' : 'Small';
+      const color = Math.random() < 0.5 ? 'Red' : 'Green';
+      const result = { time, bigSmall, color };
+
+      let results = JSON.parse(localStorage.getItem('wingo_results') || '[]');
+      results.unshift(result);
+      if (results.length > 1000) results = results.slice(0, 1000);
+      localStorage.setItem('wingo_results', JSON.stringify(results));
+
+      let bets = JSON.parse(localStorage.getItem(userId + '_bets') || '[]');
+      if (bets.length > 0 && bets[0].status === 'Pending') {
+        const bet = bets[0];
+        let wallet = parseFloat(localStorage.getItem(userId + '_wallet') || 1000);
+        if (result.bigSmall === bet.type || result.color === bet.type) {
+          wallet += bet.amount * 2;
+          bet.status = 'Win';
+        } else {
+          bet.status = 'Lose';
+        }
+        localStorage.setItem(userId + '_wallet', wallet);
+        localStorage.setItem(userId + '_bets', JSON.stringify(bets));
+        document.getElementById('walletAmount').innerText = wallet;
+      }
+      updateResults();
+      updateHistory();
+    }
+
+    setInterval(() => {
+      if (new Date().getSeconds() === 0) simulateRound();
+    }, 1000);
+
+    window.onload = function () {
+      updateResults();
+      updateHistory();
+      document.getElementById('walletAmount').innerText = localStorage.getItem(userId + '_wallet') || '1000';
+    }
+  </script>
+</body>
+</html>

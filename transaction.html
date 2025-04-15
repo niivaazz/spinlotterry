@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Transaction Confirmation</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background-color: #1e293b;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    h2 {
+      color: #facc15;
+    }
+
+    .deposit-info {
+      margin: 20px 0;
+      font-size: 1.1rem;
+    }
+
+    .deposit-info span {
+      font-weight: bold;
+      color: #22d3ee;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 100%;
+      border-radius: 6px;
+      margin-top: 10px;
+      font-size: 1rem;
+      background-color: white;
+      color: #333;
+      border: none;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 12px;
+      background-color: #16a34a;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      animation: pulse 2s infinite;
+    }
+
+    button:hover {
+      background-color: #15803d;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .message {
+      margin-top: 20px;
+      font-style: italic;
+      color: #38bdf8;
+    }
+
+    table {
+      margin-top: 40px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #334155;
+    }
+
+    th {
+      background-color: #0f172a;
+    }
+
+    .status-approved {
+      color: #22c55e;
+    }
+
+    .status-rejected {
+      color: #ef4444;
+    }
+
+    .status-pending {
+      color: #facc15;
+    }
+
+    #qrCode {
+      margin-top: 15px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Transaction Confirmation</h2>
+
+    <div class="deposit-info">
+      <p>Payment Platform: <span id="showPlatform">-</span></p>
+      <p>Amount: <span id="showAmount">-</span></p>
+    </div>
+
+    <input type="text" id="utrInput" placeholder="Enter UTR Number" />
+    <button onclick="submitUTR()">Submit UTR</button>
+
+    <div class="message" id="confirmationMessage"></div>
+
+    <h3 style="margin-top: 40px;">Your Deposit History</h3>
+    <table id="historyTable">
+      <thead>
+        <tr>
+          <th>Platform</th>
+          <th>Amount</th>
+          <th>UTR</th>
+          <th>Status</th>
+          <th>Date/Time</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+    const depositData = JSON.parse(localStorage.getItem("currentDeposit") || "{}");
+
+    // Show selected platform and amount
+    document.getElementById("showPlatform").textContent = depositData.platform || "-";
+    document.getElementById("showAmount").textContent = "₹" + (depositData.amount || "-");
+
+    // Generate QR Code for UPI ID
+    const upiID = "a.nk@superyes";
+    new QRCode(document.getElementById("qrCode"), {
+      text: upi://pay?pa=${upiID}&pn=User&mc=123456&tid=654321&tr=123456789&tn=Payment%20for%20deposit&am=${depositData.amount}&cu=INR,
+      width: 150,
+      height: 150
+    });
+
+    // Show QR code
+    document.getElementById("qrCode").style.display = "block";
+
+    function submitUTR() {
+      const utr = document.getElementById("utrInput").value.trim();
+      if (!utr) return alert("Please enter a UTR number.");
+
+      const pending = JSON.parse(localStorage.getItem("pendingDeposits") || "[]");
+      const now = new Date();
+
+      const newDeposit = {
+        email: user.email,
+        amount: depositData.amount,
+        platform: depositData.platform,
+        utr: utr,
+        status: "Pending",
+        date: now.toLocaleString()
+      };
+
+      pending.push(newDeposit);
+      localStorage.setItem("pendingDeposits", JSON.stringify(pending));
+
+      // Show waiting message
+      document.getElementById("confirmationMessage").textContent = "Waiting for confirmation from admin...";
+      document.getElementById("utrInput").value = "";
+
+      // Send deposit request to the admin dashboard (this part is simulated, so you'll need actual back-end logic to handle this)
+      sendDepositRequestToAdmin(newDeposit);
+
+      // Update history after 3s
+      setTimeout(() => {
+        const history = JSON.parse(localStorage.getItem("transactionHistory") || "[]");
+        history.push(newDeposit);
+        localStorage.setItem("transactionHistory", JSON.stringify(history));
+        loadHistory();
+      }, 3000);
+    }
+
+    function sendDepositRequestToAdmin(deposit) {
+      // Simulating a request to the admin dashboard
+      const adminRequests = JSON.parse(localStorage.getItem("adminDepositRequests") || "[]");
+      adminRequests.push(deposit);
+      localStorage.setItem("adminDepositRequests", JSON.stringify(adminRequests));
+
+      // In a real scenario, this would be an API call to the backend to notify the admin
+    }
+
+    function loadHistory() {
+      const tbody = document.querySelector("#historyTable tbody");
+      const all = JSON.parse(localStorage.getItem("transactionHistory") || "[]");
+      const userHistory = all.filter(h => h.email === user.email);
+
+      tbody.innerHTML = "";
+      userHistory.reverse().forEach(row => {
+        const statusClass = row.status === "Approved"
+          ? "status-approved"
+          : row.status === "Rejected"
+          ? "status-rejected"
+          : "status-pending";
+
+        tbody.innerHTML += `
+          <tr>
+            <td>${row.platform}</td>
+            <td>₹${row.amount}</td>
+            <td>${row.utr}</td>
+            <td class="${statusClass}">${row.status}</td>
+            <td>${row.date}</td>
+          </tr>
+        `;
+      });
+    }
+
+    loadHistory();
+  </script>
+</body>
+</html>

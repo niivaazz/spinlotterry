@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Deposit - Spin Lottery</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding: 1rem;
+    }
+    .deposit-container {
+      background: #1f2937;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      max-width: 400px;
+      width: 100%;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #facc15;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.7rem;
+      margin-top: 0.3rem;
+      border-radius: 0.5rem;
+      border: none;
+      font-size: 1rem;
+    }
+    button {
+      margin-top: 1.5rem;
+      width: 100%;
+      padding: 0.8rem;
+      background-color: #16a34a;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #15803d;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="deposit-container">
+    <h2>Make a Deposit</h2>
+    <form id="depositForm">
+      <label for="platform">Select Payment Platform</label>
+      <select id="platform" required>
+        <option value="" disabled selected>Select</option>
+        <option value="GPay">GPay</option>
+        <option value="Paytm">Paytm</option>
+        <option value="PhonePe">PhonePe</option>
+        <option value="Freecharge">Freecharge</option>
+        <option value="Airtel">Airtel</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <label for="amount">Enter Amount (₹200 - ₹50000)</label>
+      <input type="number" id="amount" min="200" max="50000" required />
+
+      <button type="submit">Submit Deposit</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("depositForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const platform = document.getElementById("platform").value;
+      const amount = parseFloat(document.getElementById("amount").value);
+
+      if (!platform || !amount || amount < 200 || amount > 50000) {
+        alert("Please enter a valid amount between ₹200 and ₹50000.");
+        return;
+      }
+
+      const depositData = {
+        platform,
+        amount,
+        timestamp: new Date().toISOString()
+      };
+
+      localStorage.setItem("currentDeposit", JSON.stringify(depositData));
+      window.location.href = "transaction.html";
+    });
+  </script>
+
+</body>
+</html>
